@@ -87,11 +87,7 @@ function renderLandingView() {
   const disciplineCount = state.disciplineData.subjects.length;
   const traffic = state.disciplineData.subjects.find((item) => item["一级学科名称"] === "交通运输工程");
   byId("landingView").innerHTML = `
-    <section class="landing-hero">
-      <p class="eyebrow">Demo Hub</p>
-      <h2>两个演示都保留，先选择入口</h2>
-      <p>十五五监测 demo 使用附件2的规划指标和驾驶舱设计；学科画像 demo 使用原有学科布局和交通运输工程下钻数据。</p>
-    </section>
+    
     <div class="landing-grid">
       <article class="demo-card plan-card">
         <div>
@@ -110,7 +106,7 @@ function renderLandingView() {
         <div>
           <p class="eyebrow">学科画像 demo</p>
           <h3>学科布局与交通运输工程下钻</h3>
-          <p>保留原有 25 个一级学科画像、横向论文预警、KPI 下钻，以及交通运输工程二级学科/方向/团队详情。</p>
+          <p> </p>
         </div>
         <div class="demo-metrics">
           <span><strong>${disciplineCount}</strong>一级学科</span>
@@ -128,7 +124,7 @@ function showLanding() {
   hideAllShells();
   byId("landingView").hidden = false;
   configureSwitch("landing");
-  setHeader("大连海事大学综合演示入口", "选择要进入的演示看板", "保留原学科画像下钻 demo，同时新增十五五监测 demo；两个演示共用同一套页面风格，但数据和业务入口相互独立。");
+  setHeader("大连海事大学综合演示入口", "选择要进入的演示看板", "");
   window.scrollTo(0, 0);
 }
 
@@ -137,7 +133,7 @@ function enterDemo(demo) {
   hideAllShells();
   if (demo === "plan") {
     byId("planDemoView").hidden = false;
-    setHeader("十五五发展规划监测 Demo", "大连海事大学规划执行驾驶舱", "依据《高校十五五指标监测驾驶舱》页面设计，承载《附件2》规划指标、年度分解、责任部门、风险预警和督办闭环。");
+    setHeader("十五五发展规划监测 Demo", "大连海事大学规划执行驾驶舱", "依据《高校十五五指标监测驾驶舱》设计，承载《大连海事大学十五五发展规划指标分解表》指标、年度分解、责任部门、风险预警和督办闭环。");
     setPlanView(state.activePlanView);
   } else {
     byId("disciplineDemoView").hidden = false;
@@ -374,7 +370,7 @@ function renderPaperWarningPanel(subjects) {
   const redWarnings = subjects.filter((item) => item["横向论文预警"]);
   const averageRate = Math.round(subjects.reduce((sum, item) => sum + item["横向论文完成度"], 0) / subjects.length);
   const warningRows = redWarnings.map((item) => `<article><div><strong>${escapeText(item["一级学科名称"])}</strong><span>${escapeText(item["学科门类"])} · ${escapeText(item["学位点授予层次"])}</span></div><b>${escapeText(item["横向论文完成度"])}%</b><small>${item["横向论文数"]} / ${item["横向论文2026年目标值"]}</small></article>`).join("");
-  return `<section class="warning-panel"><div><p class="eyebrow">横向论文 2026 目标对比</p><h2>红灯预警：${redWarnings.length} 个学科完成度低于 20%</h2><p>法学、数学、物理学横向论文完成度明显低于其他学科，其余学科控制在 30%-70% 区间，用于演示目标达成差异和预警识别。</p></div><div class="warning-summary"><div><span>全校平均完成度</span><strong>${averageRate}%</strong></div><div><span>红灯阈值</span><strong>&lt;20%</strong></div></div><div class="warning-list">${warningRows}</div></section>`;
+  return `<section class="warning-panel"><div><p class="eyebrow">横向论文 2026 目标对比</p><h2>红灯预警：${redWarnings.length} 个学科完成度低于 20%</h2><p>法学、数学、物理学横向论文完成度明显低于其他学科，用于演示目标达成差异和预警识别。</p></div><div class="warning-summary"><div><span>全校平均完成度</span><strong>${averageRate}%</strong></div><div><span>红灯阈值</span><strong>&lt;20%</strong></div></div><div class="warning-list">${warningRows}</div></section>`;
 }
 
 function renderDisciplineBoardView() {
