@@ -326,6 +326,85 @@ function renderDisciplineKpis(subjects) {
   return `<div class="kpi-grid"><button class="kpi-card kpi-button" type="button" data-discipline-kpi="total"><span class="kpi-label">一级学科总数</span><p class="kpi-value">${stats.total}</p><span class="kpi-hint">查看全部学科结构</span></button><button class="kpi-card kpi-button" type="button" data-discipline-kpi="doctoral"><span class="kpi-label">博士一级学科</span><p class="kpi-value">${stats.doctoral}</p><span class="kpi-hint">查看博士学科矩阵</span></button><button class="kpi-card kpi-button" type="button" data-discipline-kpi="master"><span class="kpi-label">硕士一级学科</span><p class="kpi-value">${stats.master}</p><span class="kpi-hint">查看硕士学科矩阵</span></button><button class="kpi-card kpi-button" type="button" data-discipline-kpi="advantage"><span class="kpi-label">优势学科</span><p class="kpi-value">${stats.advantage}</p><span class="kpi-hint">查看优势学科画像</span></button></div>`;
 }
 
+function getDisciplineKpiConfig(kind) {
+  const subjects = state.disciplineData.subjects;
+  const doctoral = subjects.filter((item) => item["学位点授予层次"] === "博士一级");
+  const master = subjects.filter((item) => item["学位点授予层次"] === "硕士一级");
+  const advantage = subjects.filter((item) => item["学科定位（优势/重点/支撑/特色）"] === "优势学科");
+  const configs = {
+    total: {
+      title: "一级学科总览",
+      eyebrow: "全校布局",
+      summary: "覆盖全校 25 个一级学科，按门类、层次、定位和软科百分位综合展示，适合快速判断学科结构完整度。",
+      subjects,
+      accent: "teal",
+      metrics: [
+        ["学科总数", subjects.length],
+        ["博士一级", doctoral.length],
+        ["硕士一级", master.length],
+      ],
+    },
+    doctoral: {
+      title: "博士一级学科矩阵",
+      eyebrow: "高层次学位点",
+      summary: "聚焦博士一级学科，呈现学校高层次学科底座和优势、重点学科的分布情况。",
+      subjects: doctoral,
+      accent: "blue",
+      metrics: [
+        ["博士一级", doctoral.length],
+        ["优势学科", doctoral.filter((item) => item["学科定位（优势/重点/支撑/特色）"] === "优势学科").length],
+        ["工学门类", doctoral.filter((item) => item["学科门类"] === "工学").length],
+      ],
+    },
+    master: {
+      title: "硕士一级学科矩阵",
+      eyebrow: "支撑与特色学科",
+      summary: "聚焦硕士一级学科，展示支撑学科、特色学科以及交叉学科储备，为后续建设梯队提供依据。",
+      subjects: master,
+      accent: "green",
+      metrics: [
+        ["硕士一级", master.length],
+        ["支撑学科", master.filter((item) => item["学科定位（优势/重点/支撑/特色）"] === "支撑学科").length],
+        ["特色学科", master.filter((item) => item["学科定位（优势/重点/支撑/特色）"] === "特色学科").length],
+      ],
+    },
+    advantage: {
+      title: "优势学科画像",
+      eyebrow: "重点突破",
+      summary: "聚焦优势学科，突出当前排名靠前、辨识度高、可作为学校学科品牌展示的核心学科。",
+      subjects: advantage,
+      accent: "gold",
+      metrics: [
+        ["优势学科", advantage.length],
+        ["博士一级", advantage.filter((item) => item["学位点授予层次"] === "博士一级").length],
+        ["前 15%", advantage.filter((item) => item.百分位 <= 15).length],
+      ],
+    },
+  };
+
+  return configs[kind] || configs.total;
+}
+
+function renderDisciplineKpiSubjectRow(subject) {
+  const isTraffic = subject["一级学科名称"] === "交通运输工程";
+  const percentile = typeof subject.百分位 === "number" ? `前 ${subject.百分位}%` : "未排名";
+  return `<article class="kpi-detail-row ${isTraffic ? "is-actionable" : ""}"><div class="kpi-detail-rank"><strong>${escapeText(percentile)}</strong><span>${escapeText(subject["软科排名/百分位段（2026年5月）"])}</span></div><div><h3>${escapeText(subject["一级学科名称"])}</h3><div class="tag-row">${tag(subject["学科代码"])}${tag(subject["学位点授予层次"], "blue")}${tag(subject["学科门类"])}${tag(subject["学科定位（优势/重点/支撑/特色）"], positionClass[subject["学科定位（优势/重点/支撑/特色）"]])}</div></div><div class="kpi-detail-action">${isTraffic ? '<button class="drill-btn" type="button" data-drill="traffic">进入明细</button>' : '<span class="muted">明细待接入</span>'}</div></article>`;
+}
+
+function showDisciplineKpiDetail(kind) {
+  const config = getDisciplineKpiConfig(kind);
+  const sorted = [...config.subjects].sort((a, b) => {
+    const ap = typeof a.百分位 === "number" ? a.百分位 : 999;
+    const bp = typeof b.百分位 === "number" ? b.百分位 : 999;
+    return ap - bp;
+  });
+  hideAllShells();
+  byId("detailView").hidden = false;
+  byId("detailView").className = "view-panel discipline-shell";
+  byId("detailView").innerHTML = `<div class="detail-actions"><button class="back-btn" type="button" data-back>返回学科画像</button></div><section class="kpi-detail-hero ${config.accent}"><div><p class="eyebrow">${escapeText(config.eyebrow)}</p><h2>${escapeText(config.title)}</h2><p>${escapeText(config.summary)}</p></div><div class="kpi-detail-metrics">${config.metrics.map(([label, value]) => `<div><span>${escapeText(label)}</span><strong>${escapeText(value)}</strong></div>`).join("")}</div></section><div class="kpi-detail-grid"><aside>${renderBars("门类结构", countBy(config.subjects, "学科门类"))}<div style="height:16px"></div>${renderBars("定位结构", countBy(config.subjects, "学科定位（优势/重点/支撑/特色）"))}</aside><section class="panel"><div class="panel-title"><h2>学科清单</h2><span class="muted">按软科百分位排序</span></div><div class="kpi-detail-list">${sorted.map(renderDisciplineKpiSubjectRow).join("")}</div></section></div>`;
+  window.scrollTo(0, 0);
+}
+
 function renderBars(title, counts) {
   const max = Math.max(...Object.values(counts));
   const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, value]) => `<div class="bar-row"><span>${escapeText(name)}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.max(6, Math.round((value / max) * 100))}%"></div></div><strong>${value}</strong></div>`).join("");
@@ -443,7 +522,7 @@ function bindEvents() {
     const indicatorButton = event.target.closest("[data-indicator-id]");
     if (indicatorButton) { renderIndicatorDetail(indicatorButton.dataset.indicatorId); return; }
     const kpi = event.target.closest("[data-discipline-kpi]");
-    if (kpi) { state.disciplineFilters.position = kpi.dataset.disciplineKpi === "advantage" ? "优势学科" : "全部"; state.disciplineFilters.degree = kpi.dataset.disciplineKpi === "doctoral" ? "博士一级" : kpi.dataset.disciplineKpi === "master" ? "硕士一级" : "全部"; renderDisciplineBoardView(); setDisciplineView("board"); return; }
+    if (kpi) { showDisciplineKpiDetail(kpi.dataset.disciplineKpi); return; }
     const drill = event.target.closest("[data-drill='traffic']");
     if (drill) { renderDisciplineTrafficDetail(); return; }
     const back = event.target.closest("[data-back]");

@@ -30,6 +30,9 @@ assert.match(js, /data-demo="discipline"/, "script should expose discipline port
 assert.match(js, /fetch\("data\/discipline-data.json"\)/, "script should load discipline data separately");
 assert.match(js, /renderDisciplineBoardView/, "script should render discipline board");
 assert.match(js, /renderDisciplineTrafficDetail/, "script should restore traffic discipline drilldown");
+assert.match(js, /showDisciplineKpiDetail/, "script should restore KPI card drilldown pages");
+assert.match(js, /renderDisciplineKpiSubjectRow/, "script should render KPI drilldown subject rows");
+assert.match(js, /data-discipline-kpi/, "script should keep KPI card click targets");
 assert.match(js, /交通运输工程/, "script should include traffic discipline drilldown copy");
 assert.match(js, /十五五监测 demo/, "script should include plan demo landing copy");
 assert.match(js, /学科画像 demo/, "script should include discipline demo landing copy");
@@ -63,6 +66,8 @@ assert.match(css, /\.demo-card/, "dashboard should style demo cards");
 assert.match(css, /\[hidden\]\s*\{[^}]*display:\s*none\s*!important/s, "hidden views and nav should not be overridden by display styles");
 assert.match(css, /\.discipline-shell/, "dashboard should style restored discipline shell");
 assert.match(css, /\.subject-grid/, "dashboard should style discipline subject cards");
+assert.match(css, /\.kpi-detail-hero/, "dashboard should style KPI drilldown hero");
+assert.match(css, /\.kpi-detail-row/, "dashboard should style KPI drilldown rows");
 assert.match(css, /\.direction-grid/, "dashboard should style traffic drilldown direction cards");
 assert.match(css, /\.plan-shell/, "dashboard should still style fifteen-five shell");
 assert.match(css, /\.supervision-board/, "dashboard should still style supervision center");
