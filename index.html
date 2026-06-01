@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>大连海事大学综合演示入口</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow" id="appEyebrow">大连海事大学综合演示入口</p>
+        <h1 id="appTitle">选择要进入的演示看板</h1>
+        <p class="subhead" id="appSubhead">保留原学科画像下钻 demo，同时新增十五五监测 demo；两个演示共用同一套页面风格，但数据和业务入口相互独立。</p>
+      </div>
+      <nav class="view-switch" id="viewSwitch" aria-label="驾驶舱视图" hidden>
+        <button class="switch-btn" type="button" data-home>入口</button>
+        <button class="switch-btn is-active" type="button" data-view="overview">总览</button>
+        <button class="switch-btn" type="button" data-view="topics">专题</button>
+        <button class="switch-btn" type="button" data-view="supervision">督办</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="landingView" class="view-panel landing-shell"></section>
+
+      <section id="planDemoView" class="view-panel plan-shell" hidden>
+        <div id="overviewView" hidden></div>
+        <div id="topicView" hidden></div>
+        <div id="supervisionView" hidden></div>
+      </section>
+
+      <section id="disciplineDemoView" class="view-panel discipline-shell" hidden>
+        <div id="disciplineBoardView" hidden></div>
+        <div id="disciplineCockpitView" hidden></div>
+      </section>
+
+      <section id="detailView" class="view-panel" hidden></section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
